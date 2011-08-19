@@ -134,12 +134,18 @@ module CanCan
     def resource_class
       case @options[:class]
       when false  then name.to_sym
-      when nil    then name.to_s.camelize.constantize
+      when nil    then namespaced_name.to_s.camelize.constantize
       when String then @options[:class].constantize
       else @options[:class]
       end
     end
-
+    
+    def namespaced_name
+      "#{@params[:controller].split('/').first.capitalize}::#{name.capitalize}".constantize
+      rescue NameError
+      name
+    end
+    
     def resource_class_with_parent
       parent_resource ? {parent_resource => resource_class} : resource_class
     end
